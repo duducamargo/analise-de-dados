@@ -17,4 +17,19 @@ for file in files:
 
 combined_df = pd.concat(dfs, ignore_index=True)
 
-print(combined_df.head())
+combined_df['event_time'] = pd.to_datetime(combined_df['event_time'])
+
+combined_df['day_of_week'] = combined_df['event_time'].dt.day_name()  
+combined_df['hour'] = combined_df['event_time'].dt.hour  
+
+heatmap_data = combined_df.pivot_table(index='day_of_week', columns='hour', aggfunc='size', fill_value=0)
+
+days_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+heatmap_data = heatmap_data.reindex(days_order)
+
+plt.figure(figsize=(12, 6))
+sns.heatmap(heatmap_data, cmap="YlGnBu", annot=False)  
+plt.title('Volume de Compras ao Longo do Tempo (Dias da Semana vs Horas do Dia)')
+plt.ylabel('Dia da Semana')
+plt.xlabel('Hora do Dia')
+plt.show()
